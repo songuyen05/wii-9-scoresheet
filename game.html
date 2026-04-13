@@ -1,0 +1,358 @@
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.app { max-width: 680px; margin: 0 auto; padding: 1rem 0; }
+.title { font-size: 20px; font-weight: 500; color: var(--color-text-primary); text-align: center; margin-bottom: 1.5rem; }
+.btn { border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); border-radius: var(--border-radius-md); padding: 7px 14px; font-size: 13px; cursor: pointer; font-family: var(--font-sans); }
+.btn:hover { background: var(--color-background-secondary); }
+.btn:active { transform: scale(0.97); }
+.setup-section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+.setup-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 10px; font-weight: 500; }
+.pcount-row { display: flex; gap: 8px; }
+.pcount-btn { flex: 1; padding: 8px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-primary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: var(--font-sans); }
+.pcount-btn.sel { background: #534AB7; color: #EEEDFE; border-color: #534AB7; }
+.player-setup-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.p-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+.name-input { flex: 1; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 10px; font-size: 14px; font-family: var(--font-sans); background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+.btn-start { width: 100%; padding: 11px; font-size: 15px; font-weight: 500; background: #534AB7; color: #EEEDFE; border: none; border-radius: var(--border-radius-md); cursor: pointer; font-family: var(--font-sans); margin-top: 4px; }
+.btn-start:hover { background: #3C3489; }
+.turn-bar { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.turn-label { font-size: 13px; color: var(--color-text-secondary); }
+.turn-btn { padding: 6px 14px; font-size: 13px; font-weight: 500; border-radius: 999px; border: 2px solid transparent; cursor: pointer; font-family: var(--font-sans); }
+.turn-btn.active-turn { border-color: #1A1A1A; }
+.turn-btn:active { transform: scale(0.96); }
+.player-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 10px; position: relative; }
+.player-card.active-card { border: 2px solid #534AB7; }
+.player-card.leading-card { border: 2px solid #1D9E75; }
+.active-badge { position: absolute; top: -10px; left: 14px; background: #534AB7; color: #EEEDFE; font-size: 10px; font-weight: 500; padding: 2px 9px; border-radius: 999px; }
+.lead-badge { position: absolute; top: -10px; right: 14px; background: #1D9E75; color: #E1F5EE; font-size: 10px; font-weight: 500; padding: 2px 9px; border-radius: 999px; }
+.card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+.p-name { font-size: 15px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+.score-area { display: flex; align-items: baseline; gap: 6px; }
+.p-score-big { font-size: 32px; font-weight: 500; line-height: 1; }
+.score-flash { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.15s; min-width: 52px; }
+.score-flash.show { opacity: 1; }
+.balls-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.balls-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+.p-ball { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; cursor: pointer; transition: transform 0.12s, opacity 0.15s; user-select: none; }
+.p-ball:hover { transform: scale(1.12); }
+.p-ball:active { transform: scale(0.95); }
+.p-ball.gone { opacity: 0.18; cursor: default; transform: none !important; }
+.penalty-row { display: flex; gap: 8px; }
+.pen-btn { flex: 1; padding: 7px 6px; font-size: 12px; font-weight: 500; border-radius: var(--border-radius-md); cursor: pointer; font-family: var(--font-sans); border: 0.5px solid; text-align: center; }
+.pen-btn:active { transform: scale(0.96); }
+.btn-foul { color: #993C1D; border-color: #D85A30; background: transparent; }
+.btn-foul:hover { background: #FAECE7; }
+.btn-scratch { color: #3C3489; border-color: #534AB7; background: transparent; }
+.btn-scratch:hover { background: #EEEDFE; }
+.modal-backdrop { display: none; min-height: 280px; background: rgba(0,0,0,0.38); border-radius: var(--border-radius-lg); align-items: center; justify-content: center; margin: 8px 0; }
+.modal-backdrop.open { display: flex; }
+.modal-box { background: var(--color-background-primary); border-radius: var(--border-radius-lg); padding: 1.25rem; max-width: 340px; width: 92%; }
+.modal-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.modal-note { font-size: 11px; color: #D85A30; margin-bottom: 10px; font-weight: 500; }
+.modal-balls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.modal-ball { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; cursor: pointer; border: 2.5px solid transparent; transition: transform 0.1s; }
+.modal-ball:hover { transform: scale(1.08); }
+.modal-ball.msel { border-color: #1A1A1A; box-shadow: 0 0 0 1px #1A1A1A; }
+.modal-ball.mgone { opacity: 0.2; cursor: not-allowed; transform: none !important; }
+.modal-actions { display: flex; gap: 8px; }
+.modal-btn { flex: 1; padding: 8px; font-size: 13px; font-weight: 500; border-radius: var(--border-radius-md); cursor: pointer; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); }
+.modal-btn.confirm { background: #534AB7; color: #EEEDFE; border-color: #534AB7; }
+.modal-btn.confirm:hover { background: #3C3489; }
+.winner-banner { background: #E1F5EE; border: 0.5px solid #5DCAA5; border-radius: var(--border-radius-lg); padding: 1.25rem; text-align: center; margin-bottom: 1rem; }
+.winner-text { font-size: 22px; font-weight: 500; color: #085041; margin-bottom: 4px; }
+.winner-sub { font-size: 13px; color: #0F6E56; margin-bottom: 12px; }
+.game-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.btn-end { background: #534AB7; color: #EEEDFE; border-color: #534AB7; font-weight: 500; }
+.btn-end:hover { background: #3C3489; }
+.log { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+.log-title { font-size: 13px; color: var(--color-text-secondary); font-weight: 500; margin-bottom: 10px; }
+.log-row { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
+.log-row:last-child { border-bottom: none; }
+.log-empty { font-size: 13px; color: var(--color-text-tertiary); text-align: center; padding: 8px 0; }
+.tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+.tag-pocket { background: #E1F5EE; color: #085041; }
+.tag-foul { background: #FAECE7; color: #993C1D; }
+.tag-scratch { background: #EEEDFE; color: #3C3489; }
+</style>
+
+<div class="app">
+  <h2 style="position:absolute;width:1px;height:1px;overflow:hidden;">9-ball pool tracker</h2>
+  <div class="title">9-ball score tracker</div>
+
+  <div id="setupScreen">
+    <div class="setup-section">
+      <div class="setup-label">Number of players</div>
+      <div class="pcount-row">
+        <button class="pcount-btn" onclick="setCount(2)">2</button>
+        <button class="pcount-btn" onclick="setCount(3)">3</button>
+        <button class="pcount-btn sel" onclick="setCount(4)">4</button>
+      </div>
+    </div>
+    <div class="setup-section">
+      <div class="setup-label">Enter player names</div>
+      <div id="playerSetupRows"></div>
+    </div>
+    <button class="btn-start" onclick="startGame()">Start game</button>
+  </div>
+
+  <div id="gameScreen" style="display:none;">
+    <div id="winnerBanner" class="winner-banner" style="display:none;">
+      <div class="winner-text" id="winnerText"></div>
+      <div class="winner-sub" id="winnerSub"></div>
+      <button class="btn btn-end" onclick="backToSetup()" style="margin-top:4px;">New game</button>
+    </div>
+    <div class="turn-bar">
+      <span class="turn-label">Whose turn:</span>
+      <div id="turnBtns" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <div id="playerCards"></div>
+    <div class="game-controls">
+      <button class="btn btn-end" onclick="endGame()">🎱 End game</button>
+      <button class="btn" onclick="backToSetup()">New game</button>
+    </div>
+    <div class="log">
+      <div class="log-title">Event log</div>
+      <div id="logList"><div class="log-empty">No events yet</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS=[
+  {bg:'#AFA9EC',text:'#26215C'},
+  {bg:'#5DCAA5',text:'#04342C'},
+  {bg:'#F0997B',text:'#4A1B0C'},
+  {bg:'#85B7EB',text:'#042C53'},
+];
+const BALL_BG=['#F5C400','#005FB5','#D2001A','#6A008A','#FF6B00','#005C2E','#8B0000','#222222','#F5C400'];
+const BALL_FG=['#1A1A1A','#fff','#fff','#fff','#fff','#fff','#fff','#fff','#1A1A1A'];
+const STRIPE=[false,false,false,false,false,false,false,false,true];
+
+let numPlayers=4,players=[],scores=[],pocketedGlobal={},eventLog=[],gameOver=false,activeTurn=0;
+let scratchPlayer=-1,scratchBall=null;
+
+function ballBg(b,flat){
+  if(STRIPE[b-1]&&!flat) return `linear-gradient(${BALL_BG[b-1]} 33%,white 33%,white 67%,${BALL_BG[b-1]} 67%)`;
+  return BALL_BG[b-1];
+}
+
+function setCount(n){
+  numPlayers=n;
+  document.querySelectorAll('.pcount-btn').forEach((b,i)=>b.classList.toggle('sel',[2,3,4][i]===n));
+  buildSetup();
+}
+
+function buildSetup(){
+  const c=document.getElementById('playerSetupRows');c.innerHTML='';
+  for(let i=0;i<numPlayers;i++){
+    const col=COLORS[i],saved=players[i]||{};
+    const row=document.createElement('div');
+    row.style.marginBottom='10px';
+    row.innerHTML=`<div class="player-setup-row">
+      <div class="p-dot" style="background:${col.bg};color:${col.text};">${i+1}</div>
+      <input class="name-input" id="sname${i}" value="${saved.name||'Player '+(i+1)}" maxlength="20"/>
+    </div>`;
+    c.appendChild(row);
+  }
+}
+
+function startGame(){
+  players=[];scores=[];pocketedGlobal={};eventLog=[];gameOver=false;activeTurn=0;scratchPlayer=-1;scratchBall=null;
+  for(let i=0;i<numPlayers;i++){
+    const name=document.getElementById('sname'+i).value.trim()||'Player '+(i+1);
+    players.push({name,color:COLORS[i]});
+    scores.push(0);
+  }
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('gameScreen').style.display='block';
+  render();
+}
+
+function render(){
+  renderTurnBar();
+  renderCards();
+  renderLog();
+}
+
+function renderTurnBar(){
+  const bar=document.getElementById('turnBtns');bar.innerHTML='';
+  players.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.className='turn-btn'+(activeTurn===i?' active-turn':'');
+    b.style.background=p.color.bg;b.style.color=p.color.text;
+    b.style.borderColor=activeTurn===i?p.color.text:'transparent';
+    b.textContent=p.name;
+    b.onclick=()=>{activeTurn=i;render();};
+    bar.appendChild(b);
+  });
+}
+
+function scoreColor(s){
+  if(s<0) return '#D85A30';
+  return 'var(--color-text-primary)';
+}
+
+function renderCards(){
+  const container=document.getElementById('playerCards');container.innerHTML='';
+  const maxScore=Math.max(...scores);
+
+  players.forEach((p,i)=>{
+    const isActive=activeTurn===i&&!gameOver;
+    const isLeading=!gameOver&&scores[i]===maxScore&&scores.filter(s=>s===maxScore).length===1;
+    const isModalOpen=scratchPlayer===i;
+
+    const card=document.createElement('div');
+    let cls='player-card';
+    if(isActive) cls+=' active-card';
+    else if(isLeading) cls+=' leading-card';
+    card.className=cls;
+
+    if(isActive) card.innerHTML+='<div class="active-badge">Their turn</div>';
+    if(isLeading&&!isActive) card.innerHTML+='<div class="lead-badge">Leading</div>';
+
+    card.innerHTML+=`<div class="card-header">
+      <div class="p-avatar" style="background:${p.color.bg};color:${p.color.text};">${p.name.charAt(0).toUpperCase()}</div>
+      <div class="p-name">${p.name}</div>
+      <div class="score-area">
+        <div class="p-score-big" id="sv${i}" style="color:${scoreColor(scores[i])};">${scores[i]}</div>
+        <div class="score-flash" id="fl${i}"></div>
+      </div>
+    </div>`;
+
+    card.innerHTML+=`<div class="balls-label">Tap a ball to pocket it — grayed balls are off the table</div><div class="balls-row" id="br${i}"></div>`;
+
+    card.innerHTML+=`<div class="penalty-row">
+      <div class="pen-btn btn-foul" onclick="doFoul(${i})">Foul (−3 pts)</div>
+      <div class="pen-btn btn-scratch" onclick="openScratch(${i})">Scratch (ball void, −3 pts)</div>
+    </div>`;
+
+    card.innerHTML+=`<div class="modal-backdrop" id="modal${i}">
+      <div class="modal-box">
+        <div class="modal-title">Scratch — ${p.name}</div>
+        <div class="modal-sub">Select the ball that went in on the scratch.</div>
+        <div class="modal-note">Ball removed from table. No points. −3 pts penalty (can go negative).</div>
+        <div class="modal-balls" id="mb${i}"></div>
+        <div class="modal-actions">
+          <button class="modal-btn" onclick="closeModal()">Cancel</button>
+          <button class="modal-btn confirm" onclick="confirmScratch(${i})">Confirm scratch</button>
+        </div>
+      </div>
+    </div>`;
+
+    container.appendChild(card);
+
+    const ballsRow=document.getElementById('br'+i);
+    for(let b=1;b<=9;b++){
+      const gone=!!pocketedGlobal[b];
+      const d=document.createElement('div');
+      d.className='p-ball'+(gone?' gone':'');
+      d.style.background=gone?BALL_BG[b-1]:ballBg(b);
+      d.style.color=BALL_FG[b-1];
+      d.textContent=b;
+      if(!gone&&!gameOver) d.onclick=()=>pocketBall(i,b);
+      ballsRow.appendChild(d);
+    }
+
+    if(isModalOpen){
+      document.getElementById('modal'+i).classList.add('open');
+      const mb=document.getElementById('mb'+i);
+      for(let b=1;b<=9;b++){
+        const gone=!!pocketedGlobal[b];
+        const d=document.createElement('div');
+        d.className='modal-ball'+(gone?' mgone':'')+(scratchBall===b?' msel':'');
+        d.style.background=ballBg(b);d.style.color=BALL_FG[b-1];
+        d.textContent=b;
+        if(!gone) d.onclick=()=>{scratchBall=scratchBall===b?null:b;renderCards();};
+        mb.appendChild(d);
+      }
+    }
+  });
+}
+
+function flash(i,text,color){
+  const el=document.getElementById('fl'+i);
+  if(!el) return;
+  el.textContent=text;el.style.color=color;el.classList.add('show');
+  setTimeout(()=>{el.classList.remove('show');el.textContent='';},1400);
+}
+
+function pocketBall(i,b){
+  if(gameOver||pocketedGlobal[b]) return;
+  pocketedGlobal[b]=true;
+  scores[i]+=b;
+  eventLog.push({type:'pocket',ball:b,player:players[i].name,pts:'+'+b});
+  flash(i,'+'+b+' pts','#1D9E75');
+  render();
+}
+
+function doFoul(i){
+  if(gameOver) return;
+  scores[i]-=3; // no floor — can go negative
+  eventLog.push({type:'foul',ball:null,player:players[i].name,pts:'−3'});
+  flash(i,'−3 foul','#D85A30');
+  render();
+}
+
+function openScratch(i){
+  if(gameOver) return;
+  scratchPlayer=i;scratchBall=null;
+  render();
+}
+
+function closeModal(){
+  scratchPlayer=-1;scratchBall=null;
+  render();
+}
+
+function confirmScratch(i){
+  if(scratchBall) pocketedGlobal[scratchBall]=true; // ball gone, no points
+  scores[i]-=3; // no floor — can go negative
+  const ballNote=scratchBall?' (ball '+scratchBall+' void)':'';
+  eventLog.push({type:'scratch',ball:scratchBall,player:players[i].name,pts:'−3'+ballNote});
+  flash(i,'−3 scratch','#D85A30');
+  scratchPlayer=-1;scratchBall=null;
+  render();
+}
+
+function endGame(){
+  gameOver=true;
+  const maxScore=Math.max(...scores);
+  const winners=players.filter((_,i)=>scores[i]===maxScore);
+  const banner=document.getElementById('winnerBanner');
+  banner.style.display='block';
+  if(winners.length>1){
+    document.getElementById('winnerText').textContent="It's a tie!";
+    document.getElementById('winnerSub').textContent=winners.map(p=>p.name).join(' & ')+' — '+maxScore+' pts each';
+  } else {
+    const wi=scores.indexOf(maxScore);
+    document.getElementById('winnerText').textContent='🎱 '+players[wi].name+' wins!';
+    document.getElementById('winnerSub').textContent=scores.map((s,i)=>players[i].name+': '+s+' pts').join('  ·  ');
+  }
+  render();
+}
+
+function renderLog(){
+  const list=document.getElementById('logList');
+  if(!eventLog.length){list.innerHTML='<div class="log-empty">No events yet</div>';return;}
+  list.innerHTML=eventLog.slice().reverse().map((e,idx)=>{
+    const num=eventLog.length-idx;
+    const tagCls=e.type==='pocket'?'tag-pocket':e.type==='foul'?'tag-foul':'tag-scratch';
+    const tagLabel=e.type==='pocket'?'pocketed':e.type==='foul'?'foul':'scratch';
+    const ballDot=e.ball?`<div style="width:18px;height:18px;border-radius:50%;background:${BALL_BG[e.ball-1]};color:${BALL_FG[e.ball-1]};font-size:10px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">${e.ball}</div>`:'';
+    return `<div class="log-row"><span style="color:var(--color-text-secondary);font-size:12px;min-width:22px;">#${num}</span>${ballDot}<span style="font-weight:500;color:var(--color-text-primary);flex:1;">${e.player}</span><span class="tag ${tagCls}">${tagLabel}</span><span style="color:var(--color-text-secondary);min-width:52px;text-align:right;">${e.pts}</span></div>`;
+  }).join('');
+}
+
+function backToSetup(){
+  gameOver=false;scratchPlayer=-1;scratchBall=null;
+  document.getElementById('winnerBanner').style.display='none';
+  document.getElementById('gameScreen').style.display='none';
+  document.getElementById('setupScreen').style.display='block';
+  buildSetup();
+}
+
+setCount(4);buildSetup();
+</script>
