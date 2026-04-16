@@ -159,13 +159,25 @@ function buildSetup(){
   }
 }
 
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 function startGame(){
-  players=[];scores=[];pocketedGlobal={};eventLog=[];gameOver=false;activeTurn=0;scratchPlayer=-1;scratchBall=null;
+    players=[];scores=[];pocketedGlobal={};eventLog=[];gameOver=false;activeTurn=0;scratchPlayer=-1;scratchBall=null;
+
   for(let i=0;i<numPlayers;i++){
     const name=document.getElementById('sname'+i).value.trim()||'Player '+(i+1);
     players.push({name,color:COLORS[i]});
-    scores.push(0);
   }
+
+  shuffle(players); // 🔥 THIS LINE ADDED
+
+  scores = new Array(players.length).fill(0);
+
   document.getElementById('setupScreen').style.display='none';
   document.getElementById('gameScreen').style.display='block';
   render();
