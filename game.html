@@ -277,7 +277,14 @@ function renderCards(){
         d.className='modal-ball'+(gone?' mgone':'')+(scratchBall===b?' msel':'');
         d.style.background=ballBg(b);d.style.color=BALL_FG[b-1];
         d.textContent=b;
-        if(!gone) d.onclick=()=>{scratchBall=scratchBall===b?null:b;renderCards();};
+        if(!gone) d.onclick=()=>{
+          if (foulSelections.includes(b)) {
+            foulSelections = foulSelections.filter(x => x !== b);
+          } else {
+            foulSelections.push(b);
+          }
+          renderCards();
+        };
         mb.appendChild(d);
       }
     }
