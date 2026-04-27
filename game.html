@@ -307,31 +307,41 @@ function pocketBall(i,b){
   render();
 }
 
-function doFoul(i){
+function openFoul(i){
   if(gameOver) return;
-  scores[i]-=3; // no floor — can go negative
-  eventLog.push({type:'foul',ball:null,player:players[i].name,pts:'−3'});
-  flash(i,'−3 foul','#D85A30');
+  foulPlayer = i;
+  foulSelections = [];
   render();
 }
 
-function openScratch(i){
-  if(gameOver) return;
-  scratchPlayer=i;scratchBall=null;
+function confirmFoul(i){
+  foulSelections.forEach(ball => {
+    pocketedGlobal[ball] = true;
+  });
+
+  scores[i] -= 3;
+
+  const note = foulSelections.length
+    ? '−3 (' + foulSelections.join(', ') + ' pocketed)'
+    : '−3 (no balls pocketed)';
+
+  eventLog.push({
+    type:'foul',
+    ball:null,
+    player:players[i].name,
+    pts:note
+  });
+
+  flash(i,'−3 foul','#D85A30');
+
+  foulPlayer = -1;
+  foulSelections = [];
+
+  activeTurn = (i + 1) % players.length; // auto next turn
   render();
 }
 
 function closeModal(){
-  scratchPlayer=-1;scratchBall=null;
-  render();
-}
-
-function confirmScratch(i){
-  if(scratchBall) pocketedGlobal[scratchBall]=true; // ball gone, no points
-  scores[i]-=3; // no floor — can go negative
-  const ballNote=scratchBall?' (ball '+scratchBall+' void)':'';
-  eventLog.push({type:'scratch',ball:scratchBall,player:players[i].name,pts:'−3'+ballNote});
-  flash(i,'−3 scratch','#D85A30');
   scratchPlayer=-1;scratchBall=null;
   render();
 }
