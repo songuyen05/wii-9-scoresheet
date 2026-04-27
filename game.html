@@ -168,7 +168,7 @@ function shuffle(array) {
 }
 
 function startGame(){
-    players=[];scores=[];pocketedGlobal={};eventLog=[];gameOver=false;activeTurn=0;scratchPlayer=-1;scratchBall=null;
+    players=[];scores=[];pocketedGlobal={};eventLog=[];gameOver=false;activeTurn=0;foulPlayer=-1;foulSelections=[];
 
   for(let i=0;i<numPlayers;i++){
     const name=document.getElementById('sname'+i).value.trim()||'Player '+(i+1);
