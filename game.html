@@ -316,8 +316,30 @@ function openFoul(i){
 
 function confirmFoul(i){
   foulSelections.forEach(ball => {
-    pocketedGlobal[ball] = true;
+    pocketedGlobal[ball] = true;   // remove ball only
   });
+
+  scores[i] -= 3;   // always lose 3 on foul
+
+  const note = foulSelections.length
+    ? '−3 (' + foulSelections.join(', ') + ' pocketed)'
+    : '−3 (no balls pocketed)';
+
+  eventLog.push({
+    type: 'foul',
+    ball: null,
+    player: players[i].name,
+    pts: note
+  });
+
+  flash(i, '−3 foul', '#D85A30');
+
+  foulPlayer = -1;
+  foulSelections = [];
+
+  activeTurn = (i + 1) % players.length;
+  render();
+}
 
   scores[i] -= 3;
 
