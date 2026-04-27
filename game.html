@@ -274,7 +274,7 @@ function renderCards(){
       for(let b=1;b<=9;b++){
         const gone=!!pocketedGlobal[b];
         const d=document.createElement('div');
-        d.className='modal-ball'+(gone?' mgone':'')+(scratchBall===b?' msel':'');
+        d.className='modal-ball'+(gone?' mgone':'')+(foulSelections.includes(b)?' msel':'');
         d.style.background=ballBg(b);d.style.color=BALL_FG[b-1];
         d.textContent=b;
         if(!gone) d.onclick=()=>{
@@ -338,28 +338,6 @@ function confirmFoul(i){
   foulSelections = [];
 
   activeTurn = (i + 1) % players.length;
-  render();
-}
-
-  scores[i] -= 3;
-
-  const note = foulSelections.length
-    ? '−3 (' + foulSelections.join(', ') + ' pocketed)'
-    : '−3 (no balls pocketed)';
-
-  eventLog.push({
-    type:'foul',
-    ball:null,
-    player:players[i].name,
-    pts:note
-  });
-
-  flash(i,'−3 foul','#D85A30');
-
-  foulPlayer = -1;
-  foulSelections = [];
-
-  activeTurn = (i + 1) % players.length; // auto next turn
   render();
 }
 
