@@ -215,7 +215,7 @@ function renderCards(){
   players.forEach((p,i)=>{
     const isActive=activeTurn===i&&!gameOver;
     const isLeading=!gameOver&&scores[i]===maxScore&&scores.filter(s=>s===maxScore).length===1;
-    const isModalOpen=scratchPlayer===i;
+    const isModalOpen = foulPlayer === i;
 
     const card=document.createElement('div');
     let cls='player-card';
@@ -238,19 +238,18 @@ function renderCards(){
     card.innerHTML+=`<div class="balls-label">Tap a ball to pocket it — grayed balls are off the table</div><div class="balls-row" id="br${i}"></div>`;
 
     card.innerHTML+=`<div class="penalty-row">
-      <div class="pen-btn btn-foul" onclick="doFoul(${i})">Foul (−3 pts)</div>
-      <div class="pen-btn btn-scratch" onclick="openScratch(${i})">Scratch (ball void, −3 pts)</div>
+      <div class="pen-btn btn-foul" onclick="openFoul(${i})">Foul (−3 pts)</div>
     </div>`;
 
     card.innerHTML+=`<div class="modal-backdrop" id="modal${i}">
       <div class="modal-box">
-        <div class="modal-title">Scratch — ${p.name}</div>
-        <div class="modal-sub">Select the ball that went in on the scratch.</div>
-        <div class="modal-note">Ball removed from table. No points. −3 pts penalty (can go negative).</div>
+        <div class="modal-title">Foul — ${p.name}</div>
+        <div class="modal-sub">Select any balls pocketed on the foul.</div>
+        <div class="modal-note">Pocketed balls are removed. Player still gets −3.</div>
         <div class="modal-balls" id="mb${i}"></div>
         <div class="modal-actions">
           <button class="modal-btn" onclick="closeModal()">Cancel</button>
-          <button class="modal-btn confirm" onclick="confirmScratch(${i})">Confirm scratch</button>
+          <button class="modal-btn confirm" onclick="confirmFoul(${i})">Confirm foul</button>
         </div>
       </div>
     </div>`;
