@@ -132,7 +132,8 @@ const BALL_FG=['#1A1A1A','#fff','#fff','#fff','#fff','#fff','#fff','#fff','#1A1A
 const STRIPE=[false,false,false,false,false,false,false,false,true];
 
 let numPlayers=4,players=[],scores=[],pocketedGlobal={},eventLog=[],gameOver=false,activeTurn=0;
-let scratchPlayer=-1,scratchBall=null;
+let foulPlayer = -1;
+let foulSelections = [];
 
 function ballBg(b,flat){
   if(STRIPE[b-1]&&!flat) return `linear-gradient(${BALL_BG[b-1]} 33%,white 33%,white 67%,${BALL_BG[b-1]} 67%)`;
@@ -174,7 +175,7 @@ function startGame(){
     players.push({name,color:COLORS[i]});
   }
 
-  shuffle(players); // 🔥 THIS LINE ADDED
+  shuffle(players);
 
   scores = new Array(players.length).fill(0);
 
